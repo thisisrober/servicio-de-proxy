@@ -1,0 +1,8 @@
+- name: Instalación del Servicio de Proxy
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: Instalar Squid
+      apt:
+        name: squid
+        state: present

@@ -1,8 +1,4 @@
 !/bin/bash
-# Sript pata generar un menu de automatizacion del servicio proxy instalado en linux pudiendo tener un menu interactivo
-#!/bin/bash
-
-# Función para mostrar el menú
 mostrar_menu() {
     clear
     echo "===================================="
@@ -19,7 +15,6 @@ mostrar_menu() {
     echo "===================================="
 }
 
-# Función para mostrar la ayuda
 mostrar_ayuda() {
     clear
     echo "===================================="
@@ -41,7 +36,6 @@ mostrar_ayuda() {
     read -p "Presiona Enter para volver al menú..."
 }
 
-# Función para instalar Squid
 instalar_squid() {
     echo "Instalando Squid Proxy..."
         sudo apt-get update
@@ -49,7 +43,6 @@ instalar_squid() {
     echo "Squid instalado correctamente."
 }
 
-# Función para configurar el puerto
 configurar_puerto() {
     read -p "Introduce el puerto para el proxy (por defecto 3128): " puerto
         puerto=${puerto:-3128}
@@ -57,7 +50,6 @@ configurar_puerto() {
     echo "Puerto configurado a $puerto."
 }
 
-# Función para habilitar autenticación
 habilitar_autenticacion() {
     echo "Habilitando autenticación..."
         sudo apt-get install -y apache2-utils
@@ -68,26 +60,22 @@ habilitar_autenticacion() {
     echo "Autenticación habilitada."
 }
 
-# Función para reiniciar el servicio
 reiniciar_squid() {
     echo "Reiniciando Squid..."
         sudo systemctl restart squid
     echo "Squid reiniciado."
 }
 
-# Función para ver el estado del servicio
 estado_squid() {
     sudo systemctl status squid
 }
 
-# Función para realizar una copia de seguridad del archivo de configuración
 copia_seguridad() {
     echo "Realizando copia de seguridad de la configuración de Squid..."
     sudo cp /etc/squid/squid.conf /etc/squid/squid.conf.backup
     echo "Copia de seguridad realizada en /etc/squid/squid.conf.backup."
 }
 
-# Menú principal
 while true; do
     mostrar_menu
     read -p "Selecciona una opción (1-8): " opcion
@@ -104,4 +92,3 @@ while true; do
     esac
     read -p "Presiona Enter para continuar..."
 done
-

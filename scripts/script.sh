@@ -96,7 +96,7 @@ if [ $# -gt 0 ]; then
         --install)
             instalarServicio
             ;;
-        --configure)
+        --backup)
             copiaSeg
             ;;
         --info)
@@ -114,4 +114,3 @@ if [ $# -gt 0 ]; then
 else
     menuPrincipal
 fi
-# Esto es un comentario de la opción
