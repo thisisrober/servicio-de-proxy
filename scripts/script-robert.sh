@@ -1,4 +1,5 @@
 #!/bin/bash
+#prueba de modificacion de rama 2
 
 function mostrarAyuda() {
     echo "Uso: $0 [opciones]"
