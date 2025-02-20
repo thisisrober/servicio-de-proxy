@@ -35,3 +35,16 @@ echo "http_access deny sitios_prohibidos" | sudo tee -a $SQUID_CONF
 #reiniciamos el servicio nuevamente
 sudo systemctl restart squid
 
+#AMPLIACION-SQUIDGUARD
+SQUIDGUARD_CONF="/etc/squidguard/squidGuard.conf"
+
+echo "Configurando SquidGuard"
+echo "dest blacklist {" | sudo tee $SQUIDGUARD_CONF
+echo "   domainlist /etc/squid/blocklist.txt" | sudo tee -a $SQUIDGUARD_CONF
+echo "}" | sudo tee -a $SQUIDGUARD_CONF
+
+echo "acl {" | sudo tee -a $SQUIDGUARD_CONF
+echo "   default {" | sudo tee -a $SQUIDGUARD_CONF
+echo "      pass !blacklist all" | sudo tee -a $SQUIDGUARD_CONF
+echo "   }" | sudo tee -a $SQUIDGUARD_CONF
+echo "}" | sudo tee -a $SQUIDGUARD_CONF
