@@ -36,6 +36,14 @@ echo "http_access deny sitios_prohibidos" | sudo tee -a $SQUID_CONF
 sudo systemctl restart squid
 
 #AMPLIACION-SQUIDGUARD
+sudo apt update
+sudo apt install squidguard
+
+#habilitamos squidguard
+echo "url_rewrite_Pprogram /usr/bin/squidguard" | sudo tee -a $SQUID_CONF
+echo "url_rewrite_children 5" | sudo tee -a $SQUID_CONF
+
+#configuramos squidguard
 SQUIDGUARD_CONF="/etc/squidguard/squidGuard.conf"
 
 echo "Configurando SquidGuard"
