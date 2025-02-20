@@ -48,3 +48,7 @@ echo "   default {" | sudo tee -a $SQUIDGUARD_CONF
 echo "      pass !blacklist all" | sudo tee -a $SQUIDGUARD_CONF
 echo "   }" | sudo tee -a $SQUIDGUARD_CONF
 echo "}" | sudo tee -a $SQUIDGUARD_CONF
+
+#aplicamos la configuracion y reiniciamos el servicio
+sudo squidGuard -C all
+sudo systemctl restart squid
