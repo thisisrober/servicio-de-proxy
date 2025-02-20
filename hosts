@@ -1,2 +1,6 @@
 [local]
 localhost ansible_connection=local
+
+# Para trabajar con otra máquina, descomentar las siguientes líneas:
+# [servidor_remoto]
+# ip_servidor ansible_ssh_user=usuario ansible_ssh_pass=contraseña
