@@ -11,3 +11,6 @@ else
     exit 1 #indica un error
 fi
 
+#configuramos el archivo de configuracion del squid
+SQUID_CONF="/etc/squid/squid.conf"
+
