@@ -23,3 +23,11 @@ echo "http_port 3128" | sudo tee -a $SQUID_CONF
 #reiniciamos el archivo y comprobamos que el squid funcione correctamente.
 sudo systemctl restart squid.service
 squid -k parse
+
+#BLOQUEO DE PAGINAS
+BLOCKLIST="/etc/squid/blocklist.txt"
+echo "Bloqueo de paginas no deseadas"
+echo -e "youtube.com" | sudo tee $BLOCKLIST
+
+echo "acl sitios_prohibidos dstdomain "/etc/squid/blocklist.txt"" | sudo tee -a $SQUID_CONF
+echo "http_access deny sitios_prohibidos" | sudo tee -a $SQUID_CONF
