@@ -10,10 +10,12 @@ El propósito principal es automatizar tareas repetitivas, como la instalación 
 
 Este repositorio contiene los siguientes componentes:
 
-- **`install_proxy.yml`**: este es el archivo playbook de Ansible para instalar y configurar el servicio de proxy (`squid`).
+- **`scripts/`**: es la carpeta que contiene diferentes versiones de scripts para gestionar el servicio de proxy, como instalación, actualización y gestión de logs.
+- **`ansible.cfg`**: es la configuración de Ansible donde se deshabilita la autentificación encriptada.
+- **`instalarproxy.yml`**: este es el archivo playbook de Ansible para instalar y configurar el servicio de proxy (`squid`).
 - **`Dockerfile`**: es el archivo de configuración para crear una imagen de Docker que contenga el servicio de proxy configurado.
 - **`hosts`**: es el archivo de inventario de Ansible que define las máquinas donde se ejecutarán los playbooks.
-- **`scripts/`**: es la carpeta que contiene diferentes versiones de scripts para gestionar el servicio de proxy, como instalación, actualización y gestión de logs.
+- **`squid.conf`**: es una copia de la configuración de Squid que se utilizará para copiar directamente a la carpeta de la configuración del servicio, ofreciendo ACLs para bloquear YouTube, Twitch, etc.
 
 ## REQUISITOS
 
