@@ -31,12 +31,32 @@ Para ejecutar este proyecto, hay que asegurarse de tener instalado el siguiente 
 Para instalar el servicio de proxy utilizando Ansible, sigue estos pasos:
 
 1. Clona el repositorio:
-
+```sh
    git clone https://github.com/thisisrober/servicio-de-proxy
    cd servicio-de-proxy
-
+```
 2. Ejecuta el playbook de Ansible para instalar el servicio de proxy:
 
    ansible-playbook -i hosts install_proxy.yml
 
-### 2. INSTALACION CON DOCKER (próximamente...)
+### 2. INSTALACION CON DOCKER
+
+Para instalar el servicio de proxy utilizando Docker, sigue estos pasos:
+
+1. Clona el repositorio:
+```sh
+   git clone https://github.com/thisisrober/servicio-de-proxy
+   cd servicio-de-proxy
+```
+
+2. Ejecuta el Dockerfile para instalar el servicio de proxy:
+```sh
+   docker build -t ubuntu-squid .
+```
+
+3. Inicia la imagen de Docker para poner en marcha el servicio:
+```sh
+   docker run -d --name squid-proxy -p 3128:3128 ubuntu-squid
+```
+
+4. Configura el servidor proxy en el navegador insertando la dirección IPv4 de la máquina con el puerto 3128, habilitado tanto para HTTP como para HTTPS.
