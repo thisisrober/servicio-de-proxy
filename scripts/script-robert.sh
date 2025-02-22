@@ -101,9 +101,9 @@ function logsServicio() {
     echo "2) Por tipo (acceso, error, etc.)"
     echo "3) Consultar logs completos"
     echo ""
-    read -p "Seleccione una opción: " option
+    read -p "Seleccione una opción: " opcion
 
-    case $option in
+    case $opcion in
         1)
             read -p "Por fecha (ejemplo: '2025-02-17'): " fecha
             sudo journalctl -u squid --since "$fecha"
@@ -172,15 +172,15 @@ function menuPrincipal() {
         echo ">> 6) Ver datos de red"
         echo ">> 9) Salir"
         echo ""
-        read -p "Seleccione una opción: " option
-        case $option in
+        read -p "Seleccione una opción: " opcion
+        case $opcion in
             1)
                 echo "Seleccione cómo instalar el servicio:"
                 echo "1) Con comandos"
                 echo "2) Con Ansible"
                 echo "3) Con Docker"
-                read -p "Seleccione una opción: " suboption
-                case $suboption in
+                read -p "Seleccione una opción: " subopcion
+                case $subopcion in
                     1) instalarConComandos ;;
                     2) instalarConAnsible ;;
                     3) instalarConDocker ;;
