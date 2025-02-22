@@ -3,12 +3,13 @@
 function mostrarAyuda() {
     echo "Uso: $0 [opciones]"
     echo "Opciones:"
-    echo ">>  --install      Instala el servicio Squid."
+    echo ">>  --network       Muestra los datos de red de tu equipo."
     echo ">>  --info         Muestra información del servicio Squid."
+    echo ">>  --install      Instala el servicio Squid."
+    echo ">>  --uninstall    Desinstala el servicio Squid."
     echo ">>  --logs         Muestra los logs del servicio Squid."
     echo ">>  --start        Inicia el servicio Squid."
     echo ">>  --stop         Detiene el servicio Squid."
-    echo ">>  --network       Muestra los datos de red de tu equipo."
     echo ">>  --config       Edita la configuración de Squid."
     echo ">>  --help         Muestra esta ayuda y las opciones disponibles."
     echo ""
@@ -19,7 +20,7 @@ function datosRed() {
     echo "Información de la red:"
     IP=$(hostname -I | grep -oP '\d+\.\d+\.\d+\.\d+' | head -n 1)
     GATEWAY=$(ip route | grep default | grep -oP 'default via \K\S+')
-    MASK=$(ifconfig | grep -A 1 "$IP" | grep -oP 'Mask:\K\S+')
+    MASK=$(ip -o -f inet addr show | awk '/scope global/ {print $4}' | cut -d/ -f2)
 
     echo "IP: $IP"
     echo "Máscara de Red: $MASK"
@@ -87,7 +88,11 @@ function instalarConDocker() {
 }
 
 function instalarConComandos() {
-    comprobarInstalacion
+    if [ -f /etc/squid/squid.conf ]; then
+        echo "Squid ya está instalado. No es necesario realizar la instalación."
+        return 
+    fi
+    
     echo "Instalando Squid..."
     sudo apt update
     sudo apt install -y squid
@@ -95,26 +100,43 @@ function instalarConComandos() {
 }
 
 function eliminarServicio() {
+    if systemctl is-active --quiet squid; then
+        echo "Deteniendo el servicio Squid antes de eliminarlo..."
+        sudo systemctl stop squid
+    fi
+
     echo "Eliminando el servicio Squid..."
     sudo apt remove --purge -y squid
+
     sudo apt autoremove -y
-    echo "Servicio eliminado."
+    sudo apt clean
+
+    sudo rm -rf /etc/squid /var/log/squid
+
+    echo "Servicio Squid eliminado correctamente."
 }
 
 function iniciarServicio() {
-    echo "Iniciando el servicio Squid..."
-    sudo systemctl start squid
-    echo "Servicio iniciado."
+    if systemctl is-active --quiet squid; then
+        echo "El servicio Squid ya está en ejecución."
+    else
+        echo "Iniciando el servicio Squid..."
+        sudo systemctl start squid
+        echo "Servicio iniciado."
+    fi
 }
 
 function detenerServicio() {
-    echo "Deteniendo el servicio Squid..."
-    sudo systemctl stop squid
-    echo "Servicio detenido."
+    if systemctl is-active --quiet squid; then
+        echo "Deteniendo el servicio Squid..."
+        sudo systemctl stop squid
+        echo "Servicio detenido."
+    else
+        echo "El servicio Squid ya está detenido."
+    fi
 }
 
 function logsServicio() {
-    clear
     echo "Seleccione el tipo de log que desea consultar:"
     echo "1) Por fecha"
     echo "2) Por tipo (acceso, error, etc.)"
@@ -146,7 +168,7 @@ function logsServicio() {
                     sudo grep "$patron" /var/log/squid/cache.log
                     ;;
                 *)
-                    echo "ERROR: la opción no válida. Inténtalo de nuevo."
+                    echo "ERROR: opción no válida. Inténtalo de nuevo."
                     ;;
             esac
             ;;
@@ -154,7 +176,7 @@ function logsServicio() {
             sudo journalctl -u squid
             ;;
         *)
-            echo "ERROR: la opción no válida. Inténtalo de nuevo."
+            echo "ERROR: opción no válida. Inténtalo de nuevo."
             ;;
     esac
 }
@@ -168,10 +190,10 @@ function editarConfiguracion() {
     echo "¿Quieres aplicar los cambios y reiniciar el servicio Squid? (s/n) o (y/n)"
     read -p "Respuesta: " respuesta
     
-    if [[ "$respuesta" == "s" || "$respuesta" == "S" || "$respuesta" == "y" || "$respuesta" == "Y" || "$respuesta" == "si" || "$respuesta" == "Si" || "$respuesta" == "sI" || "$respuesta" == "SI" || "$respuesta" == "yes" || "$respuesta" == "Yes" || "$respuesta" == "yEs" || "$respuesta" == "yES" || "$respuesta" == "yeS" || "$respuesta" == "YEs" || "$respuesta" == "YES" ]]; then
+    if [[ "$respuesta" =~ ^[sSyY](i|I|e|E|es|ES|si|SI|yes|YES)?$ ]]; then
         sudo systemctl restart squid
         echo "Servicio Squid reiniciado con los nuevos cambios."
-    else if [[ "$respuesta" == "n" || "$respuesta" == "N" || "$respuesta" == "no" || "$respuesta" == "No" || "$respuesta" == "nO" || "$respuesta" == "NO" ]]; then
+    elif [[ "$respuesta" =~ ^[nN](o|O)?$ ]]; then
         echo "Los cambios se han guardado pero no se han aplicado. No se reiniciará el servicio."
     else
         echo "ERROR: Respuesta no válida. No se aplicaron los cambios."
@@ -185,12 +207,11 @@ function menuPrincipal() {
         echo "==== MENÚ DE ADMINISTRACIÓN DE SQUID ===="
         echo "========================================="
         echo ">> 1) Instalar servicio"
-        echo ">> 2) Información del servicio"
-        echo ">> 3) Consultar logs"
-        echo ">> 4) Iniciar servicio"
-        echo ">> 5) Detener servicio"
-        echo ">> 6) Ver datos de red"
-        echo ">> 7) Editar configuración de Squid"
+        echo ">> 2) Eliminar servicio"
+        echo ">> 3) Iniciar servicio"
+        echo ">> 4) Detener servicio"
+        echo ">> 5) Consultar logs del servicio"
+        echo ">> 6) Editar configuración del servicio"
         echo ">> 9) Salir"
         echo ""
         read -p "Seleccione una opción: " opcion
@@ -209,18 +230,17 @@ function menuPrincipal() {
                 esac
                 read -p "Presione la tecla [ENTER] para continuar..."
                 ;;
-            2) informacionServicio ;;
-            3) logsServicio ;;
-            4) iniciarServicio ;;
-            5) detenerServicio ;;
-            6) datosRed ;;
-            7) editarConfiguracion ;;
+            2) eliminarServicio ;;
+            3) iniciarServicio ;;
+            4) detenerServicio ;;
+            5) logsServicio ;;
+            6) editarConfiguracion ;;
             9)
                 echo "Saliendo..."
                 exit 0
                 ;;
             *)
-                echo "ERROR: la opción no válida. Inténtalo de nuevo."
+                echo "ERROR: opción no válida. Inténtalo de nuevo."
                 sleep 2
                 ;;
         esac
@@ -229,14 +249,17 @@ function menuPrincipal() {
 
 if [ $# -gt 0 ]; then
     case "$1" in
-        --install)
-            instalarServicio
+        --network)
+            datosRed
             ;;
         --info)
             informacionServicio
             ;;
-        --logs)
-            logsServicio
+        --install)
+            instalarConComandos
+            ;;
+        --uninstall)
+            eliminarServicio
             ;;
         --start)
             iniciarServicio
@@ -244,8 +267,8 @@ if [ $# -gt 0 ]; then
         --stop)
             detenerServicio
             ;;
-        --network)
-            datosRed
+        --logs)
+            logsServicio
             ;;
         --config)
             editarConfiguracion
