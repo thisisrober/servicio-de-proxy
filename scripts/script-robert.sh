@@ -17,7 +17,9 @@ function mostrarAyuda() {
 }
 
 function datosRed() {
-    echo "Información de la red:"
+    echo "==============================="
+    echo "==== INFORMACIÓN DE LA RED ===="
+    echo "==============================="
     IP=$(hostname -I | grep -oP '\d+\.\d+\.\d+\.\d+' | head -n 1)
     GATEWAY=$(ip route | grep default | grep -oP 'default via \K\S+')
     MASK=$(ip -o -f inet addr show | awk '/scope global/ {print $4}' | cut -d/ -f2)
