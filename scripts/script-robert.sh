@@ -202,7 +202,6 @@ function editarConfiguracion() {
 
 function menuPrincipal() {
     while true; do
-        clear
         echo "========================================="
         echo "==== MENÚ DE ADMINISTRACIÓN DE SQUID ===="
         echo "========================================="
@@ -218,14 +217,14 @@ function menuPrincipal() {
         case $opcion in
             1)
                 echo "Seleccione cómo instalar el servicio:"
-                echo "1) Con comandos"
-                echo "2) Con Ansible"
-                echo "3) Con Docker"
+                echo "1) Con Ansible"
+                echo "2) Con Docker"
+                echo "3) Con comandos"
                 read -p "Seleccione una opción: " subopcion
                 case $subopcion in
-                    1) instalarConComandos ;;
-                    2) instalarConAnsible ;;
-                    3) instalarConDocker ;;
+                    1) instalarConAnsible ;;
+                    2) instalarConDocker ;;
+                    3) instalarConComandos ;;
                     *) echo "Opción no válida." ;;
                 esac
                 read -p "Presione la tecla [ENTER] para continuar..."
@@ -246,6 +245,9 @@ function menuPrincipal() {
         esac
     done
 }
+
+datosRed
+informacionServicio
 
 if [ $# -gt 0 ]; then
     case "$1" in
