@@ -9,6 +9,7 @@ function mostrarAyuda() {
     echo ">>  --start        Inicia el servicio Squid."
     echo ">>  --stop         Detiene el servicio Squid."
     echo ">>  --network       Muestra los datos de red de tu equipo."
+    echo ">>  --config       Edita la configuración de Squid."
     echo ">>  --help         Muestra esta ayuda y las opciones disponibles."
     echo ""
     echo "Si se ejecuta sin argumentos, se mostrará un menú interactivo."
@@ -23,6 +24,24 @@ function datosRed() {
     echo "IP: $IP"
     echo "Máscara de Red: $MASK"
     echo "Puerta de enlace: $GATEWAY"
+}
+
+function informacionServicio() {
+    echo "==========================================="
+    echo "==== INFORMACIÓN DEL SERVICIO DE SQUID ===="
+    echo "==========================================="
+    if command -v squid &> /dev/null; then
+        squid -v 2>&1 | head -n 1
+    else
+        echo "AVISO: Squid no está instalado."
+    fi
+    echo ""
+    echo "Estado del servicio Squid:"
+    if command -v systemctl &> /dev/null; then
+        systemctl status squid --no-pager
+    else
+        sudo service squid status
+    fi
 }
 
 function comprobarInstalacion() {
@@ -140,21 +159,22 @@ function logsServicio() {
     esac
 }
 
-function informacionServicio() {
-    echo "==========================================="
-    echo "==== INFORMACIÓN DEL SERVICIO DE SQUID ===="
-    echo "==========================================="
-    if command -v squid &> /dev/null; then
-        squid -v 2>&1 | head -n 1
+function editarConfiguracion() {
+    echo "Editando la configuración de Squid..."
+    echo "Se abrirá el archivo squid.conf en el editor de texto."
+    
+    sudo nano /etc/squid/squid.conf
+    
+    echo "¿Quieres aplicar los cambios y reiniciar el servicio Squid? (s/n) o (y/n)"
+    read -p "Respuesta: " respuesta
+    
+    if [[ "$respuesta" == "s" || "$respuesta" == "S" || "$respuesta" == "y" || "$respuesta" == "Y" || "$respuesta" == "si" || "$respuesta" == "Si" || "$respuesta" == "sI" || "$respuesta" == "SI" || "$respuesta" == "yes" || "$respuesta" == "Yes" || "$respuesta" == "yEs" || "$respuesta" == "yES" || "$respuesta" == "yeS" || "$respuesta" == "YEs" || "$respuesta" == "YES" ]]; then
+        sudo systemctl restart squid
+        echo "Servicio Squid reiniciado con los nuevos cambios."
+    else if [[ "$respuesta" == "n" || "$respuesta" == "N" || "$respuesta" == "no" || "$respuesta" == "No" || "$respuesta" == "nO" || "$respuesta" == "NO" ]]; then
+        echo "Los cambios se han guardado pero no se han aplicado. No se reiniciará el servicio."
     else
-        echo "AVISO: Squid no está instalado."
-    fi
-    echo ""
-    echo "Estado del servicio Squid:"
-    if command -v systemctl &> /dev/null; then
-        systemctl status squid --no-pager
-    else
-        sudo service squid status
+        echo "ERROR: Respuesta no válida. No se aplicaron los cambios."
     fi
 }
 
@@ -170,6 +190,7 @@ function menuPrincipal() {
         echo ">> 4) Iniciar servicio"
         echo ">> 5) Detener servicio"
         echo ">> 6) Ver datos de red"
+        echo ">> 7) Editar configuración de Squid"
         echo ">> 9) Salir"
         echo ""
         read -p "Seleccione una opción: " opcion
@@ -193,6 +214,7 @@ function menuPrincipal() {
             4) iniciarServicio ;;
             5) detenerServicio ;;
             6) datosRed ;;
+            7) editarConfiguracion ;;
             9)
                 echo "Saliendo..."
                 exit 0
@@ -222,11 +244,11 @@ if [ $# -gt 0 ]; then
         --stop)
             detenerServicio
             ;;
-        --restart)
-            reiniciarServicio
-            ;;
         --network)
             datosRed
+            ;;
+        --config)
+            editarConfiguracion
             ;;
         --help)
             mostrarAyuda
